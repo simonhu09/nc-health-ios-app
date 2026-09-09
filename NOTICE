@@ -1,0 +1,10 @@
+Health Journal for Nextcloud
+Copyright (C) 2026 Health Journal contributors
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+This independent client implements behavior and an API documented by Nextcloud Health:
+https://github.com/nextcloud/health
+
+Nextcloud Health is copyright its contributors and licensed under AGPL-3.0-or-later.
+“Nextcloud” is a trademark of Nextcloud GmbH. This project is not endorsed by or affiliated with Nextcloud GmbH.
+No source code from Nextcloud Health is copied into this application; API names and the fallback metric registry are interoperability facts derived from its OpenAPI document and MetricService.

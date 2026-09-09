@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+import Foundation
+public enum HealthCoreError:Error,LocalizedError,Equatable {case invalidServer, insecureServer,invalidCredentials,invalidValue(String),unsupportedConversion(String,String),ocs(Int,String),invalidResponse
+ public var errorDescription:String?{switch self{case .invalidServer:return "Invalid server URL";case .insecureServer:return "HTTPS is required";case .invalidCredentials:return "Login and app password are required";case .invalidValue(let s):return s;case .unsupportedConversion(let a,let b):return "Cannot convert \(a) to \(b)";case .ocs(_,let s):return s;case .invalidResponse:return "Invalid server response"}}}
+public struct ServerConfiguration:Equatable,Sendable {public let url:URL;public init(server:String)throws{let s=server.trimmingCharacters(in:.whitespacesAndNewlines);guard let c=URLComponents(string:s),let scheme=c.scheme?.lowercased(),let host=c.host,!host.isEmpty else{throw HealthCoreError.invalidServer};#if DEBUG
+ let local=host=="localhost"||host=="127.0.0.1"||host=="::1"
+#else
+ let local=false
+#endif
+ guard scheme=="https"||local else{throw HealthCoreError.insecureServer};guard c.percentEncodedUser==nil,c.percentEncodedPassword==nil,c.query==nil,c.fragment==nil else{throw HealthCoreError.invalidServer};if let port=c.port,!(port>0&&port<65536){throw HealthCoreError.invalidServer};guard let u=c.url else{throw HealthCoreError.invalidServer};url=u}}
+public struct Credentials:Equatable,Sendable {public let login:String;public let appPassword:String;public init(login:String,appPassword:String)throws{guard !login.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,!appPassword.isEmpty else{throw HealthCoreError.invalidCredentials};self.login=login;self.appPassword=appPassword}}
+public enum InputValidator {public static func validate(value:Double,metric:MetricDefinition)throws{if value.isNaN||value.isInfinite{throw HealthCoreError.invalidValue("Value must be finite")};if let m=metric.minimum,value<m{throw HealthCoreError.invalidValue("Value is below minimum")};if let m=metric.maximum,value>m{throw HealthCoreError.invalidValue("Value is above maximum")};if (metric.valueType == .scale||metric.valueType == .counter),value.rounded() != value{throw HealthCoreError.invalidValue("Value must be a whole number")}};public static func validate(option:String,metric:MetricDefinition)throws{guard metric.valueType == .event,!option.isEmpty,metric.options.contains(option)else{throw HealthCoreError.invalidValue("Choose a valid option")}}}

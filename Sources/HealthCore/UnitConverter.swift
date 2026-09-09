@@ -1,0 +1,3 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+import Foundation
+public enum UnitConverter {public static func convert(_ value:Double,from:String,to:String)throws->Double{if from==to{return value};switch(from,to){case("kg","lb"):return value*2.2046226218;case("lb","kg"):return value/2.2046226218;case("cm","in"):return value/2.54;case("in","cm"):return value*2.54;case("celsius","fahrenheit"):return value*9/5+32;case("fahrenheit","celsius"):return(value-32)*5/9;case("mmol_l","mg_dl"):return value*18.0182;case("mg_dl","mmol_l"):return value/18.0182;case("kpa","mmhg"):return value*7.50062;case("mmhg","kpa"):return value/7.50062;case("kg","st"):return value/6.35029318;case("st","kg"):return value*6.35029318;default:throw HealthCoreError.unsupportedConversion(from,to)}}}
